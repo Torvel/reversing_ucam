@@ -415,6 +415,10 @@ static void usb_release_dev(struct device *dev)
 	udev = to_usb_device(dev);
 	hcd = bus_to_hcd(udev->bus);
 
+
+	printk(KERN_DEBUG, "CUSTOM_DEBUG -- RESOURCES ASSOCIATED WITH DEVICE %s WILL BE RELEASED\n", udev->bus);
+	printk(KERN_DEBUG, "CUSTOM_DEBUG -- DEVICE INFO: PRODUCT: %s, MANUFACTURER: %s, SERIAL: %s\n", udev->product, udev->manufacturer, udev->serial);
+
 	usb_destroy_configuration(udev);
 	usb_release_bos_descriptor(udev);
 	of_node_put(dev->of_node);
@@ -794,6 +798,8 @@ EXPORT_SYMBOL_GPL(usb_put_intf);
 int usb_lock_device_for_reset(struct usb_device *udev,
 			      const struct usb_interface *iface)
 {
+	printk(KERN_DEBUG, "CUSTOM_DEBUG -- TRYING TO LOCK THE DEVICE %s FOR RESET\n", udev->bus);
+
 	unsigned long jiffies_expire = jiffies + HZ;
 
 	if (udev->state == USB_STATE_NOTATTACHED)
@@ -930,6 +936,8 @@ void usb_free_coherent(struct usb_device *dev, size_t size, void *addr,
 	if (!addr)
 		return;
 	hcd_buffer_free(dev->bus, size, addr, dma);
+
+	printk(KERN_DEBUG, "CUSTOM_DEBUG -- THE USB DEVICE %s IS TRYING TO ALLOCATE %d BYTES OF MEMORY\n", dev->bus, size);
 }
 EXPORT_SYMBOL_GPL(usb_free_coherent);
 
@@ -986,6 +994,9 @@ static int __init usb_init(void)
 		pr_info("%s: USB support disabled\n", usbcore_name);
 		return 0;
 	}
+
+	printk(KERN_DEBUG, "CUSTOM_DEBUG -- USB MODULE INITIALIZATION\n");
+
 	usb_init_pool_max();
 
 	usb_debugfs_init();
@@ -1051,6 +1062,8 @@ static void __exit usb_exit(void)
 	usb_acpi_unregister();
 	usb_debugfs_cleanup();
 	idr_destroy(&usb_bus_idr);
+
+	printk(KERN_DEBUG, "CUSTOM_DEBUG -- USB MODULE CLEANUP\n");
 }
 
 subsys_initcall(usb_init);
